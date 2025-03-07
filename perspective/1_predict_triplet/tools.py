@@ -1,5 +1,6 @@
 import time
-import openai
+from token import OP
+from sklearn import base
 import toml
 import sys
 import os
@@ -19,7 +20,7 @@ def load_api_key(toml_file_path):
         os.environ[key] = str(value)
 
 # Define a function that adds a delay to a Completion API call
-def delayed_completion(delay_in_seconds: float = 1, max_trials: int = 1, **kwargs):
+def delayed_completion(client, delay_in_seconds: float = 1, max_trials: int = 1, **kwargs):
     """Delay a completion by a specified amount of time."""
 
     # Sleep for the delay
@@ -29,7 +30,7 @@ def delayed_completion(delay_in_seconds: float = 1, max_trials: int = 1, **kwarg
     output, error = None, None
     for _ in range(max_trials):
         try:
-            output = openai.ChatCompletion.create(**kwargs)
+            output = client.chat.completions.create(**kwargs)
             break
         except Exception as e:
             error = e
@@ -44,7 +45,7 @@ def prepare_data(prompt, datum):
     return prompt + input_txt + postfix
 
 def post_process(completion, choices):
-    content = completion['choices'][0]['message']['content'].strip()
+    content = completion.choices[0].message.content.strip()
     result = []
     for choice in choices:
         choice_txt = "Choice" + choice

@@ -1,14 +1,17 @@
 import os
 import argparse
 import json
-import openai
+from openai import OpenAI
 from tqdm import tqdm
-from tools import delayed_completion, prepare_data, post_process
-
+from tools import delayed_completion, prepare_data, post_process, load_api_key
 
 def predict(args):
-    openai.organization = args.openai_org
-    openai.api_key = os.getenv("OPENAI_API_KEY")
+    load_api_key(toml_file_path=args.toml_file_path)
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    base_url = os.getenv("OPENAI_BASE_URL")
+
+    async_client = OpenAI(api_key=api_key, base_url=base_url)
 
     pred_path = args.data_path.split("/")[-1].replace(".json", f"-{args.model_name}{'-temp' + str(round(args.temperature, 1)) if args.temperature > 0 else ''}-pred.json")
     pred_path = os.path.join("predicted_triplet_results", pred_path)
@@ -37,7 +40,7 @@ def predict(args):
         messages = [
             {"role": "user", "content": datum['prepared']}
         ]
-        completion, error = delayed_completion(delay_in_seconds=args.delay, max_trials=args.max_trials, model=args.model_name, messages=messages, max_tokens=10, temperature=args.temperature)
+        completion, error = delayed_completion(async_client, delay_in_seconds=args.delay, max_trials=args.max_trials, model=args.model_name, messages=messages, max_tokens=10, temperature=args.temperature)
         if completion is None:
             print(f"Saving data after {idx + 1} inference.")
             with open(pred_path, 'w') as f:
@@ -68,6 +71,7 @@ if __name__ == "__main__":
     parser.add_argument("--data_path", default=None, type=str)
     parser.add_argument("--openai_org", type=str, required=True)
     parser.add_argument("--model_name", type=str, default="gpt-3.5-turbo")
+    parser.add_argument("--toml_file_path", type=str, required=True)
     parser.add_argument("--delay", type=int, default=1)
     parser.add_argument("--max_trials", type=int, default=10)
     parser.add_argument("--save_every", type=int, default=50)
