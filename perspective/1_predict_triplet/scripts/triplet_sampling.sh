@@ -1,12 +1,12 @@
 # ===== instructor-large =====
 scale=small
-for dataset in banking77 few_rel_nat stackexchange go_emotion
+for dataset in banking77 #few_rel_nat stackexchange go_emotion
 do
     for max_query in 1024
     do
         for embed in instructor
         do
-            feat_path=../../datasets/${dataset}/${scale}_embeds.hdf5
+            feat_path=../../datasets/${dataset}/${scale}_embeds_e5.hdf5
             python triplet_sampling.py \
                 --data_path ../../datasets/${dataset}/${scale}.jsonl \
                 --feat_path $feat_path \

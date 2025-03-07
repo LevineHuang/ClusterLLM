@@ -1,10 +1,11 @@
 # ===== original embedding =====
+model_name="/mnt/workspace/pretrain_model/multilingual-e5-large-instruct"
 for dataset in banking77
 do
     for scale in small
     do
         CUDA_VISIBLE_DEVICES=1 OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 python get_embedding_e5.py \
-            --model-name-or-path intfloat/e5-large \
+            --model-name-or-path ${model_name} \
             --input_path ../../datasets/${dataset}/${scale}.jsonl \
             --output_path ../../datasets/${dataset}/${scale}_embeds_e5.hdf5 \
             --scale $scale \

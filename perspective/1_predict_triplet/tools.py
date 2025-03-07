@@ -1,5 +1,22 @@
 import time
 import openai
+import toml
+import sys
+import os
+
+def load_api_key(toml_file_path):
+    try:
+        with open(toml_file_path, "r") as file:
+            data = toml.load(file)
+    except FileNotFoundError:
+        print(f"File not found: {toml_file_path}", file=sys.stderr)
+        return
+    except toml.TomlDecodeError:
+        print(f"Error decoding TOML file: {toml_file_path}", file=sys.stderr)
+        return
+    # Set environment variables
+    for key, value in data.items():
+        os.environ[key] = str(value)
 
 # Define a function that adds a delay to a Completion API call
 def delayed_completion(delay_in_seconds: float = 1, max_trials: int = 1, **kwargs):
