@@ -1,6 +1,7 @@
 # data
 datasets/
 perspective/1_predict_triplet/nohup.out
+nohup.out
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

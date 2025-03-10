@@ -34,6 +34,7 @@ cd perspective/1_predict_triplet
 bash scripts/predict_triplet.sh
 ```
 Predicted triplets will be in `perspective/1_predict_triplet/predicted_triplet_results`. Details instructions see bash script.
+
 ### 4. Convert triplets
 This step only converts the format.
 ```bash

@@ -1,6 +1,7 @@
 import os
 import argparse
 import json
+from litellm import output_parse_pii
 from openai import OpenAI
 from tqdm import tqdm
 from tools import delayed_completion, prepare_data, post_process, load_api_key
@@ -14,7 +15,9 @@ def predict(args):
     async_client = OpenAI(api_key=api_key, base_url=base_url)
 
     pred_path = args.data_path.split("/")[-1].replace(".json", f"-{args.model_name}{'-temp' + str(round(args.temperature, 1)) if args.temperature > 0 else ''}-pred.json")
-    pred_path = os.path.join("predicted_triplet_results", pred_path)
+    output_dir = "predicted_triplet_results"
+    os.makedirs(output_dir, exist_ok=True)
+    pred_path = os.path.join(output_dir, pred_path)
     print("Save in: ", pred_path)
     if os.path.exists(pred_path):
         with open(pred_path, 'r') as f:
